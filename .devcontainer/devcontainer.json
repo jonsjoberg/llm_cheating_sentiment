@@ -1,0 +1,30 @@
+{
+	"name": "Python 3",
+	"image": "mcr.microsoft.com/devcontainers/python:2-3.13-bookworm",
+	"remoteUser": "vscode",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {},
+		"ghcr.io/devcontainers-extra/features/fzf:1": {},
+		"ghcr.io/devcontainers-extra/features/ruff:1": {},
+		"ghcr.io/devcontainers-extra/features/ty:1": {}
+	},
+	"mounts": [
+		{
+			"source": "cache-${devcontainerId}",
+			"target": "/home/${remoteUser}/.cache",
+			"type": "volume"
+		},
+		{
+			"source": "venv-${devcontainerId}",
+			"target": "${containerWorkspaceFolder}/.venv",
+			"type": "volume"
+		}
+	],
+	"containerEnv": {
+		"UV_PROJECT_ENVIRONMENT": "${containerWorkspaceFolder}/.venv",
+		"VIRTUAL_ENV": "${containerWorkspaceFolder}/.venv"
+	},
+	"updateContentCommand": "sudo chown -R vscode /home/vscode/.cache ${containerWorkspaceFolder}/.venv"
+}
