@@ -12,3 +12,6 @@ products_to_check: list[SteamProduct] = [
 
 STEAM_REQUEST_PER_SECOND = 2
 LLM_MAX_CONCURRENT = 10
+LLM_MODEL = "nvidia/nemotron-nano-9b-v2:free"
+FIREBASE_JSON = "cheating-sentiment-firebase-adminsdk-fbsvc-81f714302e.json"
+DEFAULT_LOOKBACK_WINDOW_HOURS = 24

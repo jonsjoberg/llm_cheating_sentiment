@@ -1,35 +1,10 @@
+from defined_types import ReviewWithSentiment
 
-from pydantic import BaseModel
 import asyncio
-from enum import Enum
 from steam_product import SteamReview, SteamProduct
 from abc import ABC, abstractmethod
 import pandas as pd
 
-
-class CheatingSentiment(Enum):
-    POSITIVE = 'positive'
-    NOT_MENTIONED = 'not mentioned'
-    NEGATIVE = 'negative'
-
-    @classmethod
-    def from_str(cls, s: str | None):
-        if s is None:
-            return None
-        elif (s.lower() == 'positive'):
-            return CheatingSentiment.POSITIVE
-        elif s.lower() in ["not mentioned", "not_mentioned"]:
-            return CheatingSentiment.NOT_MENTIONED
-        elif s.lower() == 'negative':
-            return CheatingSentiment.NEGATIVE
-
-        return None
-
-
-class ReviewWithSentiment(BaseModel):
-    steam_product: SteamProduct
-    steam_review: SteamReview
-    cheating_sentiment: CheatingSentiment | None
 
 
 def reviews_to_pandas(reviews: list[ReviewWithSentiment]) -> pd.DataFrame:
