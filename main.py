@@ -2,7 +2,7 @@ import config
 import firebase
 import steam_product
 import asyncio
-from config import finals, STEAM_REQUEST_PER_SECOND, LLM_MAX_CONCURRENT, DEFAULT_LOOKBACK_WINDOW_HOURS
+from config import LLM_MAX_REQUESTS_PER_SECOND, finals, STEAM_REQUEST_PER_SECOND, LLM_MAX_CONCURRENT, DEFAULT_LOOKBACK_WINDOW_HOURS
 from datetime import datetime, timedelta, timezone
 from llm import openrouter
 from llm.client import extract_cheating_sentiment
@@ -35,7 +35,8 @@ async def main():
         client=llm_client,
         reviews=reviews,
         steam_product=product,
-        max_concurrent=LLM_MAX_CONCURRENT
+        max_concurrent=LLM_MAX_CONCURRENT,
+        max_request_per_seconds=LLM_MAX_REQUESTS_PER_SECOND,
     )
 
     await firebase.insert_reviews(

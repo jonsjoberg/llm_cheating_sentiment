@@ -77,6 +77,7 @@ class CheatingSentiment(Enum):
 
 class FirestoreReview(BaseModel):
     sentiment: CheatingSentiment | None
+    timestamp_created: datetime
 
     def to_dict(self) -> dict[str, str | None]:
         if self.sentiment is None:
@@ -93,4 +94,7 @@ class ReviewWithSentiment(BaseModel):
     cheating_sentiment: CheatingSentiment | None
 
     def to_firestore_review(self) -> FirestoreReview:
-        return FirestoreReview(sentiment=self.cheating_sentiment)
+        return FirestoreReview(
+            sentiment=self.cheating_sentiment,
+            timestamp_created=self.steam_review.timestamp_created
+        )

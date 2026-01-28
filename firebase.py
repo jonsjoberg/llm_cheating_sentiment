@@ -53,6 +53,10 @@ async def insert_reviews(db: AsyncClient, steam_product: SteamProduct, reviews_w
         log.info(f'failed ot find steam_product: {steam_product.app_id}')
         await insert_steam_product(db, steam_product)
 
+    if len(reviews_with_sentiment) == 0:
+        log.info('no reviews to insert, early out')
+        return
+
     batch_size = 500
     n_batches = math.floor(len(reviews_with_sentiment)/batch_size) + 1
     log.info(f'{n_batches} to insert')
@@ -74,4 +78,4 @@ async def insert_reviews(db: AsyncClient, steam_product: SteamProduct, reviews_w
         log.info(
             'commiting batch'
         )
-        batch.commit()
+        await batch.commit()
