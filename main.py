@@ -1,23 +1,33 @@
+import config
+import firebase
 import steam_product
 import asyncio
-from config import finals, STEAM_REQUEST_PER_SECOND, LLM_MAX_CONCURRENT
-from datetime import datetime, timezone
+from config import LLM_MAX_REQUESTS_PER_SECOND, finals, STEAM_REQUEST_PER_SECOND, LLM_MAX_CONCURRENT, DEFAULT_LOOKBACK_WINDOW_HOURS
+from datetime import datetime, timedelta, timezone
 from llm import openrouter
-from llm.client import extract_cheating_sentiment, LLMClient, ReviewWithSentiment
+from llm.client import extract_cheating_sentiment
 from dotenv import load_dotenv
 load_dotenv()
 
 
-async def get_reviews_and_sentiment(
-    product: steam_product.SteamProduct,
-    from_dt: datetime,
-    llm_client: LLMClient
-) -> list[ReviewWithSentiment]:
+async def main():
+
+    firestore_client = firebase.get_firestore_client()
+    last_created_ts = await firebase.get_last_review_ts(firestore_client, finals.app_id)
+    if last_created_ts is None:
+        last_created_ts = (
+            datetime.now(timezone.utc) -
+            timedelta(hours=DEFAULT_LOOKBACK_WINDOW_HOURS)
+        )
+
+    llm_client = openrouter.OpenRouter(config.LLM_MODEL)
+
+    product = finals
 
     reviews = await steam_product.fetch_steam_reviews(
         product,
         steam_product.steam_review_base_url,
-        from_dt=from_dt,
+        from_dt=last_created_ts,
         request_per_second=STEAM_REQUEST_PER_SECOND
     )
 
@@ -25,27 +35,15 @@ async def get_reviews_and_sentiment(
         client=llm_client,
         reviews=reviews,
         steam_product=product,
-        max_concurrent=LLM_MAX_CONCURRENT
+        max_concurrent=LLM_MAX_CONCURRENT,
+        max_request_per_seconds=LLM_MAX_REQUESTS_PER_SECOND,
     )
 
-    return reviews_with_sentiment
-
-
-async def main():
-
-    llm_client = openrouter.OpenRouter(openrouter.DEVSTRAL_FREE)
-
-    from_dt = datetime.strptime(
-        '2026-01-20', "%Y-%m-%d").replace(tzinfo=timezone.utc)
-
-    product = finals
-
-    reviews_with_sentiment = await get_reviews_and_sentiment(
-        product, from_dt, llm_client
+    await firebase.insert_reviews(
+        db=firestore_client,
+        steam_product=product,
+        reviews_with_sentiment=reviews_with_sentiment
     )
-
-    for review in reviews_with_sentiment:
-        print(f"{review.steam_product.name} - {review.steam_review.recommendation_id} - {review.cheating_sentiment}")
 
 
 if __name__ == "__main__":

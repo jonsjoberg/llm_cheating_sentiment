@@ -3,10 +3,8 @@ from log import log
 import httpx
 from steam_product import SteamReview, SteamProduct
 import os
-from .client import LLMClient, ReviewWithSentiment, CheatingSentiment
-
-
-DEVSTRAL_FREE = "mistralai/devstral-2512:free"
+from .client import LLMClient
+from defined_types import ReviewWithSentiment, CheatingSentiment
 
 
 class OpenRouter(LLMClient):

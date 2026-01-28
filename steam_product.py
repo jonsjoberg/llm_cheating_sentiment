@@ -1,59 +1,9 @@
-from typing import Optional
 import asyncio
 from log import log
 import datetime
 import httpx
-from pydantic import BaseModel, Field, ValidationError
-
-
-class SteamProduct(BaseModel):
-    name: str
-    app_id: int
-
-
-class Author(BaseModel):
-    steam_id: int = Field(alias='steamid')
-    num_games_owned: int
-    num_reviews: int
-    playtime_forever: int
-    playtime_last_two_weeks: int
-    playtime_at_review: int
-    last_played: int
-
-
-class SteamReview(BaseModel):
-    recommendation_id: int = Field(alias="recommendationid")
-    author: Author
-    language: str
-    review: str
-    timestamp_created: datetime.datetime
-    timestamp_updated: datetime.datetime
-    voted_up: bool
-    votes_up: int
-    votes_funny: int
-    weighted_vote_score: float
-    comment_count: int
-    steam_purchase: bool
-    received_for_free: bool
-    written_during_early_access: bool
-    primarily_steam_deck: bool
-
-
-class SteamQuerySummary(BaseModel):
-    num_reviews: int
-    review_score: Optional[float] = None
-    review_score_desc: Optional[str] = None
-    total_positive: Optional[int] = None
-    total_negative: Optional[int] = None
-    total_reviews: Optional[int] = None
-
-
-class SteamReviews(BaseModel):
-    success: int
-    query_summary: SteamQuerySummary
-    reviews: list[SteamReview]
-    cursor: str
-
+from pydantic import ValidationError
+from defined_types import SteamProduct, SteamReview, SteamReviews
 
 steam_review_base_url = "https://store.steampowered.com/appreviews/{app_id}"
 
@@ -65,6 +15,10 @@ async def fetch_steam_reviews(
     request_per_second: float,
     only_english: bool = True
 ) -> list[SteamReview]:
+
+    log.info(
+        f'fetching reviews for app_id {prod.app_id} from {from_dt.isoformat()}'
+    )
 
     reviews: list[SteamReview] = []
 
