@@ -79,13 +79,13 @@ class FirestoreReview(BaseModel):
     sentiment: CheatingSentiment | None
     timestamp_created: datetime
 
-    def to_dict(self) -> dict[str, str | None]:
+    def to_dict(self) -> dict[str, str | datetime | None]:
         if self.sentiment is None:
             value = None
         else:
             value = self.sentiment.value
 
-        return {"sentiment": value}
+        return {"sentiment": value, "timestamp_created": self.timestamp_created}
 
 
 class ReviewWithSentiment(BaseModel):

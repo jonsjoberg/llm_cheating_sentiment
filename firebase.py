@@ -28,7 +28,7 @@ async def get_last_review_ts(db: AsyncClient, app_id: int) -> datetime | None:
         .limit(1)\
         .select(['timestamp_created'])\
         .get()
-
+    log.info(last_review)
     last_timestamp_created = last_review[0].get(
         'timestamp_created').replace(tzinfo=timezone.utc)
     log.info(
@@ -69,8 +69,11 @@ async def insert_reviews(db: AsyncClient, steam_product: SteamProduct, reviews_w
             f'creating batch: {b}, start_idx: {start_idx}, end_idx: {end_idx}'
         )
 
-        currend_reviews = reviews_with_sentiment[start_idx:end_idx]
-        for r in currend_reviews:
+        current_reviews = reviews_with_sentiment[start_idx:end_idx]
+        for r in current_reviews:
+            if r.cheating_sentiment is None:
+                continue
+
             ref = db.document(
                 f'apps/{steam_product.app_id}/reviews/{r.steam_review.recommendation_id}'
             )

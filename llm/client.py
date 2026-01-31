@@ -6,22 +6,22 @@ from defined_types import ReviewWithSentiment
 import asyncio
 from steam_product import SteamReview, SteamProduct
 from abc import ABC, abstractmethod
-import pandas as pd
+# import pandas as pd
 
 
-def reviews_to_pandas(reviews: list[ReviewWithSentiment]) -> pd.DataFrame:
+# def reviews_to_pandas(reviews: list[ReviewWithSentiment]) -> pd.DataFrame:
 
-    reviews_as_dicts = [
-        {
-            'app_id': r.steam_product.app_id,
-            'product_name': r.steam_product.name,
-            'created_dt': r.steam_review.timestamp_created,
-            'recommendation_id': r.steam_review.recommendation_id,
-            'cheating_sentiment': r.cheating_sentiment
-        } for r in reviews
-    ]
+#     reviews_as_dicts = [
+#         {
+#             'app_id': r.steam_product.app_id,
+#             'product_name': r.steam_product.name,
+#             'created_dt': r.steam_review.timestamp_created,
+#             'recommendation_id': r.steam_review.recommendation_id,
+#             'cheating_sentiment': r.cheating_sentiment
+#         } for r in reviews
+#     ]
 
-    return pd.DataFrame(reviews_as_dicts)
+#     return pd.DataFrame(reviews_as_dicts)
 
 
 class LLMClient(ABC):

@@ -1,0 +1,29 @@
+services:
+  llamacpp-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    ports:
+      - 8080:8080
+    volumes:
+      - ./models:/models
+    environment:
+      # alternatively, you can use "LLAMA_ARG_MODEL_URL" to download the model
+      # LLAMA_ARG_MODEL: /models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      LLAMA_ARG_MODEL_URL: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/df5bf01389a39c743ab467d734bf501681e041c5/qwen2.5-0.5b-instruct-q4_k_m.gguf?download=true
+      LLAMA_ARG_CTX_SIZE: 8192
+      LLAMA_ARG_N_PARALLEL: 2
+      LLAMA_ARG_ENDPOINT_METRICS: 1
+      LLAMA_ARG_PORT: 8080
+    command: [ "-m", "/models/qwen2.5-0.5b-instruct-q4_k_m.gguf", "--temp", "0", "--host", "0.0.0.0" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s # Give it time to load large models before failing
+
+  cheating-sentiment:
+    image: cheating_sentiment:latest
+    pull_policy: never
+    depends_on:
+      llamacpp-server:
+        condition: service_healthy
