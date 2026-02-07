@@ -1,0 +1,26 @@
+html {
+	box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
+:root {
+	--positive-color: #8abeb7;
+	--negative-color: #cc6766;
+	--main-color: #7fa0bc;
+}
+body {
+	min-height: 100vh;
+	background: #282c34;
+	background-attachment: fixed;
+	margin: 0;
+	font-family: 'Doto', sans-serif;
+	font-optical-sizing: auto;
+	font-weight: 400;
+	font-style: normal;
+	font-variation-settings: 'ROND' 0;
+	color: var(--main-color);
+}

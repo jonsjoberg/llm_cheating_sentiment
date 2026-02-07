@@ -1,11 +1,34 @@
 <script lang="ts">
+	import Bar from '$lib/plot/Bar.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-{#each data?.appsWithReviews as a}
-	<p>{a.app.name} -{a.reviewsPerSentiment.negative} | + {a.reviewsPerSentiment.positive}</p>
-{/each}
+<main>
+	<h1>Cheating sentiment</h1>
+	<div class="bars">
+		<Bar reviewData={data.appsWithReviews} />
+	</div>
+	<div class="explanation">
+		Out of the reviews for this game in the last 2 weeks, what is proportion that had a negative vs
+		positive view on cheating in this game
+	</div>
+</main>
+
+<style>
+	.bars {
+		width: 500px;
+		padding: 10px;
+	}
+	main {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+	}
+	.explanation {
+		width: 500px;
+		text-align: center;
+	}
+</style>
