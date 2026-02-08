@@ -33,19 +33,19 @@
 	const maxPositivePct = $derived(Math.max(...plotData.map((i) => i.positivePct!)));
 	const minNegativePct = $derived(Math.min(...plotData.map((i) => i.negativePct!)));
 	const maxPct = $derived(Math.max(maxPositivePct, -minNegativePct));
-	// const spacing = $derived(maxPct > 10 ? 5 : 1);
-	const spacing = 25;
+	const spacing = $derived(maxPct > 10 ? 2.5 : 1);
+	// const spacing = 25;
 	const xTicks = $derived(calculateXTicks(maxPct, spacing));
 	const padding = 20;
 
-	let width = $state(500);
+	let width = $state(750);
 	const height = $derived(50 * plotData.length + padding);
 	const innerHeight = $derived(height - 3 * padding);
 	const barheight = $derived((innerHeight / plotData.length) * 0.9);
 
 	const xScale = $derived(
 		scaleLinear()
-			.domain([-100, 100])
+			.domain([-maxPct, maxPct])
 			.range([padding, width - padding])
 	);
 
@@ -95,8 +95,9 @@
 			{/each}
 		</g>
 		<g class="sentiments">
-			<text y={height} x={xScale(50)} text-anchor="middle">Positive</text>
-			<text y={height} x={xScale(-50)} text-anchor="middle">Negative</text>
+			<text y={height} x={xScale(maxPct / 2)} text-anchor="middle">Positive</text>
+			<text y={height} x={zeroX} text-anchor="middle">[%]</text>
+			<text y={height} x={xScale(-maxPct / 2)} text-anchor="middle">Negative</text>
 		</g>
 	</svg>
 </div>
@@ -120,6 +121,7 @@
 	}
 	.name text {
 		fill: var(--main-color);
+		font-weight: 500;
 		filter: drop-shadow(2px 2px 0px #282c34);
 	}
 	.sentiments text {
