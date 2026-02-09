@@ -40,3 +40,5 @@ vite.config.ts.timestamp-*
 
 frontend/.firebase/
 frontend/.firebaserc
+
+llama_server.log
