@@ -64,48 +64,34 @@ export const getAllSentimentsPerApp = async (
 	app: FBSteamApp,
 	lookback_window_days: number
 ): Promise<AppReviewsPerSentiment> => {
-	const positive = getReviewsPerAppAndSentiment(
-		db,
-		app,
-		ReviewSentiment.Positive,
-		lookback_window_days
-	);
-	const negative = getReviewsPerAppAndSentiment(
-		db,
-		app,
-		ReviewSentiment.Negative,
-		lookback_window_days
-	);
-	const notMentioned = getReviewsPerAppAndSentiment(
-		db,
-		app,
-		ReviewSentiment.NotMentioned,
-		lookback_window_days
-	);
+	const fromDate = new Date();
+	fromDate.setDate(fromDate.getDate() - lookback_window_days);
+	const toDate = new Date();
+
+	const reviewsSummarized = await db
+		.collection('apps')
+		.doc(`${app.appId}`)
+		.collection('summarized_reviews')
+		.orderBy(admin.firestore.FieldPath.documentId())
+		.startAt(fromDate.toISOString().split('T')[0])
+		.endAt(toDate.toISOString().split('T')[0])
+		.get();
+
+	let positive = 0;
+	let negative = 0;
+	let notMentioned = 0;
+	reviewsSummarized.forEach((r) => {
+		positive += r.get(ReviewSentiment.Positive);
+		negative += r.get(ReviewSentiment.Negative);
+		notMentioned += r.get(ReviewSentiment.NotMentioned);
+	});
 
 	return {
 		app,
 		reviewsPerSentiment: {
-			positive: await positive,
-			negative: await negative,
-			notMentioned: await notMentioned
+			positive: positive,
+			negative: negative,
+			notMentioned: notMentioned
 		}
 	};
-};
-
-export const getReviewsPerAppAndSentiment = async (
-	db: admin.firestore.Firestore,
-	app: FBSteamApp,
-	sentiment: ReviewSentiment,
-	lookback_window_days: number
-): Promise<number> => {
-	const fromDate = new Date(); // Today's date
-	fromDate.setDate(fromDate.getDate() - lookback_window_days);
-
-	const reviewsRef = db.collection('apps').doc(`${app.appId}`).collection('reviews');
-	const reviewsWithSentiment = reviewsRef
-		.where('timestamp_created', '>=', fromDate)
-		.where('sentiment', '==', sentiment);
-	const count = await reviewsWithSentiment.count().get();
-	return count.data().count;
 };

@@ -1,4 +1,5 @@
-from defined_types import SteamProduct
+import argparse
+from defined_types import SteamProduct, ReviewWithSentiment
 
 
 import firebase
@@ -17,13 +18,21 @@ from config import (
     marvel,
     tarkov,
 )
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 
 from llm import local_llama
 from llm.client import extract_cheating_sentiment, LLMClient
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def get_dates(reviews_with_sentiments: list[ReviewWithSentiment]) -> set[date]:
+
+    dates = set(
+        [r.steam_review.timestamp_created.date() for r in reviews_with_sentiments]
+    )
+    return dates
 
 
 async def extract_for_steam_product(
@@ -59,14 +68,28 @@ async def extract_for_steam_product(
         reviews_with_sentiment=reviews_with_sentiment,
     )
 
+    updated_dates = get_dates(reviews_with_sentiment)
+
+    await firebase.summarize_reviews(db, steam_product, updated_dates)
+
 
 async def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--summarize-only", action="store_true")
+    args = parser.parse_args()
 
     firestore_client = firebase.get_firestore_client()
 
     llm_client = local_llama.LocalLlama()
 
     steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov]
+    if args.summarize_only:
+        for app in steam_apps:
+            today = datetime.now().date()
+            last_10_days = [today - timedelta(days=i) for i in range(10)]
+            await firebase.summarize_reviews(firestore_client, app, set(last_10_days))
+        return
 
     for app in steam_apps:
         await extract_for_steam_product(
