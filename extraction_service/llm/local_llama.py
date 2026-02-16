@@ -15,7 +15,9 @@ class LocalLlama(LLMClient):
     llm_url = "http://localhost:8080/v1/chat/completions"
     model = "Mistral-Small-3.1-24B-Instruct-2503-GGUF"
 
-    def __init__(self):
+    def __init__(self, base_prompt: str | None = None):
+        if base_prompt is not None:
+            self.base_prompt = base_prompt
         pass
 
     def get_model(self) -> str:

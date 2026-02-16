@@ -7,8 +7,7 @@ cs2 = SteamProduct(name="Counter-Strike 2", app_id=730)
 pubg = SteamProduct(name="PUBG: BATTLEGROUNDS", app_id=578080)
 marvel = SteamProduct(name="Marvel Rivals", app_id=2767030)
 tarkov = SteamProduct(name="Escape from Tarkov", app_id=3932890)
-
-products_to_check: list[SteamProduct] = [finals, arc, bf6]
+apex = SteamProduct(name="Apex Legends", app_id=1172470)
 
 STEAM_REQUEST_PER_SECOND = 2
 LLM_MAX_CONCURRENT = 10
