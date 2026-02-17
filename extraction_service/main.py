@@ -18,6 +18,7 @@ from config import (
     marvel,
     tarkov,
     apex,
+    cod,
 )
 from datetime import datetime, timedelta, timezone, date
 
@@ -84,7 +85,7 @@ async def main():
 
     llm_client = local_llama.LocalLlama()
 
-    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex]
+    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex, cod]
     if args.summarize_only:
         for app in steam_apps:
             today = datetime.now().date()

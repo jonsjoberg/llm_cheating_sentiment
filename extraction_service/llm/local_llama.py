@@ -63,7 +63,7 @@ class LocalLlama(LLMClient):
                         },
                     },
                 },
-                timeout=120,
+                timeout=240,
             )
 
             # resp.raise_for_status()

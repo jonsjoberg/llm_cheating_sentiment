@@ -9,16 +9,16 @@ class SteamProduct(BaseModel):
     app_id: int
 
     def to_dict(self) -> dict[str, str | int]:
-        return {'name': self.name, 'app_id': self.app_id}
+        return {"name": self.name, "app_id": self.app_id}
 
 
 class Author(BaseModel):
-    steam_id: int = Field(alias='steamid')
+    steam_id: int = Field(alias="steamid")
     num_games_owned: int
     num_reviews: int
     playtime_forever: int
     playtime_last_two_weeks: int
-    playtime_at_review: int
+    playtime_at_review: Optional[int] = None
     last_played: int
 
 
@@ -57,19 +57,19 @@ class SteamReviews(BaseModel):
 
 
 class CheatingSentiment(Enum):
-    POSITIVE = 'positive'
-    NOT_MENTIONED = 'not mentioned'
-    NEGATIVE = 'negative'
+    POSITIVE = "positive"
+    NOT_MENTIONED = "not mentioned"
+    NEGATIVE = "negative"
 
     @classmethod
     def from_str(cls, s: str | None):
         if s is None:
             return None
-        elif (s.lower() == 'positive'):
+        elif s.lower() == "positive":
             return CheatingSentiment.POSITIVE
         elif s.lower() in ["not mentioned", "not_mentioned"]:
             return CheatingSentiment.NOT_MENTIONED
-        elif s.lower() == 'negative':
+        elif s.lower() == "negative":
             return CheatingSentiment.NEGATIVE
 
         return None
@@ -96,5 +96,5 @@ class ReviewWithSentiment(BaseModel):
     def to_firestore_review(self) -> FirestoreReview:
         return FirestoreReview(
             sentiment=self.cheating_sentiment,
-            timestamp_created=self.steam_review.timestamp_created
+            timestamp_created=self.steam_review.timestamp_created,
         )
