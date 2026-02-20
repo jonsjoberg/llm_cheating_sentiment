@@ -59,31 +59,22 @@ export type AppReviewsPerSentiment = {
 	reviewsPerSentiment: ReviewsPerSentiment;
 };
 
-export const getAllSentimentsPerApp = async (
+export const getSnapshotSentimentsPerApp = async (
 	db: admin.firestore.Firestore,
 	app: FBSteamApp,
-	lookback_window_days: number
+	fromDate: Date
 ): Promise<AppReviewsPerSentiment> => {
-	const fromDate = new Date();
-	fromDate.setDate(fromDate.getDate() - lookback_window_days);
 	const toDate = new Date();
 
-	const reviewsSummarized = await db
-		.collection('apps')
-		.doc(`${app.appId}`)
-		.collection('summarized_reviews')
-		.orderBy(admin.firestore.FieldPath.documentId())
-		.startAt(fromDate.toISOString().split('T')[0])
-		.endAt(toDate.toISOString().split('T')[0])
-		.get();
+	const reviewsSummarized = await getSentimentPerDaysAndApp(db, app, fromDate, toDate);
 
 	let positive = 0;
 	let negative = 0;
 	let notMentioned = 0;
-	reviewsSummarized.forEach((r) => {
-		positive += r.get(ReviewSentiment.Positive);
-		negative += r.get(ReviewSentiment.Negative);
-		notMentioned += r.get(ReviewSentiment.NotMentioned);
+	reviewsSummarized.sentimentsPerDay.forEach((r) => {
+		positive += r.reviewsPerSentiment.positive ?? 0;
+		negative += r.reviewsPerSentiment.negative ?? 0;
+		notMentioned += r.reviewsPerSentiment.notMentioned ?? 0;
 	});
 
 	return {
@@ -93,5 +84,51 @@ export const getAllSentimentsPerApp = async (
 			negative: negative,
 			notMentioned: notMentioned
 		}
+	};
+};
+
+export type SentimentPerDay = {
+	day: Date;
+	reviewsPerSentiment: ReviewsPerSentiment;
+};
+
+export type SentimentPerDaysAndApp = {
+	app: FBSteamApp;
+	sentimentsPerDay: SentimentPerDay[];
+};
+
+export const getSentimentPerDaysAndApp = async (
+	db: admin.firestore.Firestore,
+	app: FBSteamApp,
+	fromDate: Date | undefined = undefined,
+	toDate: Date | undefined = undefined
+): Promise<SentimentPerDaysAndApp> => {
+	let reviewsPerDayQuery = db
+		.collection('apps')
+		.doc(`${app.appId}`)
+		.collection('summarized_reviews')
+		.orderBy(admin.firestore.FieldPath.documentId());
+
+	if (fromDate != undefined)
+		reviewsPerDayQuery = reviewsPerDayQuery.startAt(fromDate.toISOString().split('T')[0]);
+	if (toDate != undefined)
+		reviewsPerDayQuery = reviewsPerDayQuery.endAt(toDate.toISOString().split('T')[0]);
+
+	const reviewsPerDay = await reviewsPerDayQuery.get();
+
+	const sentimentsPerDay: SentimentPerDay[] = reviewsPerDay.docs.map((d) => {
+		return {
+			day: new Date(`${d.ref.id}T00:00:00`),
+			reviewsPerSentiment: {
+				positive: d.get(ReviewSentiment.Positive),
+				negative: d.get(ReviewSentiment.Negative),
+				notMentioned: d.get(ReviewSentiment.NotMentioned)
+			}
+		};
+	});
+
+	return {
+		app: app,
+		sentimentsPerDay: sentimentsPerDay
 	};
 };

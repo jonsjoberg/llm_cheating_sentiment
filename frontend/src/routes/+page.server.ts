@@ -1,16 +1,35 @@
 import type { PageServerLoad } from './$types';
 
-import { db, getAllSentimentsPerApp, getSteamApps } from '$lib/firebase_server';
+import {
+	db,
+	getSentimentPerDaysAndApp,
+	getSnapshotSentimentsPerApp,
+	getSteamApps,
+	type AppReviewsPerSentiment,
+	type SentimentPerDaysAndApp
+} from '$lib/firebase_server';
 
 export const load: PageServerLoad = async () => {
-	const lookback_window_days = 7;
+	const snapshotLookbackWindowDays = 7;
+	const snapshotFromDate = new Date();
+	snapshotFromDate.setDate(snapshotFromDate.getDate() - snapshotLookbackWindowDays);
+
+	const overTimeLookbackWindowDays = 180;
+	const overTimeFromDate = new Date();
+	overTimeFromDate.setDate(overTimeFromDate.getDate() - overTimeLookbackWindowDays);
 
 	const apps = await getSteamApps(db!);
 
-	const appsWithReviewsPromises = apps.map((a) => {
-		return getAllSentimentsPerApp(db!, a, lookback_window_days);
-	});
-	const appsWithReviews = await Promise.all(appsWithReviewsPromises);
+	const snaphotsPromises: Promise<AppReviewsPerSentiment>[] = [];
+	const overTimesPromises: Promise<SentimentPerDaysAndApp>[] = [];
 
-	return { appsWithReviews };
+	apps.forEach((a) => {
+		snaphotsPromises.push(getSnapshotSentimentsPerApp(db!, a, snapshotFromDate));
+		overTimesPromises.push(getSentimentPerDaysAndApp(db!, a, overTimeFromDate));
+	});
+
+	const appsWithReviews = await Promise.all(snaphotsPromises);
+	const overtimeSentiment = await Promise.all(overTimesPromises);
+
+	return { appsWithReviews, overtimeSentiment };
 };

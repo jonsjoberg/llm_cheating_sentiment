@@ -38,7 +38,7 @@
 	const xTicks = $derived(calculateXTicks(maxPct, spacing));
 	const padding = 20;
 
-	let width = $state(750);
+	let width = $state(1000);
 	const height = $derived(50 * plotData.length + padding);
 	const innerHeight = $derived(height - 3 * padding);
 	const barheight = $derived((innerHeight / plotData.length) * 0.9);
@@ -110,14 +110,6 @@
 	.negativeBar rect {
 		fill: var(--negative-color);
 		stroke: none;
-	}
-	.tick line {
-		stroke: var(--main-color);
-		stroke-dasharray: 2;
-		opacity: 0.5;
-	}
-	.tick text {
-		fill: var(--main-color);
 	}
 	.name text {
 		fill: var(--main-color);
