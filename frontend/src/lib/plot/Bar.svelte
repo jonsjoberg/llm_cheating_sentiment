@@ -105,16 +105,18 @@
 <style>
 	.positiveBar rect {
 		fill: var(--positive-color);
-		stroke: none;
+		stroke: var(--main-color);
+		stroke-width: 1px;
 	}
 	.negativeBar rect {
 		fill: var(--negative-color);
-		stroke: none;
+		stroke: var(--main-color);
+		stroke-width: 1px;
 	}
 	.name text {
 		fill: var(--main-color);
 		font-weight: 500;
-		filter: drop-shadow(2px 2px 0px #282c34);
+		/* filter: drop-shadow(2px 2px 0px #282c34); */
 	}
 	.sentiments text {
 		fill: var(--main-color);

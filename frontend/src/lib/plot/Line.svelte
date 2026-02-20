@@ -2,6 +2,7 @@
 	import type { SentimentPerDay, SentimentPerDaysAndApp } from '$lib/firebase_server';
 	import { scaleLinear, scaleTime, type NumberValue } from 'd3-scale';
 	import { line } from 'd3-shape';
+	import { onDestroy } from 'svelte';
 	import tippy, { followCursor, type MultipleTargets } from 'tippy.js';
 	const { overtimeSentiment }: { overtimeSentiment: SentimentPerDaysAndApp[] } = $props();
 
@@ -59,7 +60,9 @@
 				content: pd.name,
 				followCursor: true,
 				plugins: [followCursor],
-				theme: 'tomato'
+				theme: 'tomato',
+				animation: 'myFade',
+				duration: 500
 			});
 			return tooltip.destroy;
 		};
@@ -171,6 +174,7 @@
 				<path
 					class="line"
 					class:lineHover={hoveredLine === pd.name}
+					class:anyHover={hoveredLine !== pd.name && hoveredLine != null}
 					d={lineGenerator(pd.sentimentPerDay)}
 					fill="none"
 				/>
@@ -194,14 +198,22 @@
 	}
 	.line {
 		stroke: var(--main-color);
-		stroke-width: 1px;
-		stroke-dasharray: 2 2;
+		stroke-width: 1.5px;
+		/* stroke-dasharray: 2 2; */
 		z-index: 1;
+		transition:
+			stroke-width 1s ease,
+			opacity 1s ease;
 	}
 	.lineHover {
-		stroke-width: 4px;
+		stroke-width: 5px;
 		stroke-dasharray: none;
+		stroke: var(--main-color);
+		pointer-events: none;
 		z-index: 99;
+	}
+	.anyHover {
+		opacity: 0.25;
 	}
 	.selectionBar {
 		display: flex;

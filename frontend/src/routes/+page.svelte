@@ -1,8 +1,6 @@
 <script lang="ts">
 	import OverTime from '$lib/OverTime.svelte';
-	import Bar from '$lib/plot/Bar.svelte';
 	import Snapshot from '$lib/Snapshot.svelte';
-	import Table from '$lib/Table.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -14,19 +12,19 @@
 </script>
 
 <main>
-	<h1>Cheating sentiment</h1>
+	<h1>cheating sentiment</h1>
 	<div class="buttons">
 		<button
 			class={active === 'snapshot' ? 'active' : ''}
 			onclick={() => {
 				active = 'snapshot';
-			}}>Snapshot</button
+			}}>snapshot</button
 		>
 		<button
 			class={active === 'overtime' ? 'active' : ''}
 			onclick={() => {
 				active = 'overtime';
-			}}>Over Time</button
+			}}>over time</button
 		>
 	</div>
 	<div class="info">

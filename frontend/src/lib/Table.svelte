@@ -36,7 +36,7 @@
 	table,
 	tr,
 	td {
-		border: 1px dashed var(--main-color);
+		border: 1px solid var(--main-color);
 		border-collapse: collapse;
 		padding: 0.25em 1em;
 	}

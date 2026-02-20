@@ -8,41 +8,39 @@ html {
 }
 
 :root {
-	--positive-color: #8abeb7;
-	--negative-color: #cc6766;
-	--main-color: #7fa0bc;
-	--background-lighter: #3b414d;
-	--background: #282c34;
+	--positive-color: #00ff48;
+	--negative-color: #ff8000;
+	--main-color: #000;
+	--background-selected: #f9ff00;
+	--background: #fff;
 }
 body {
 	min-height: 100vh;
 	background: var(--background);
 	background-attachment: fixed;
 	margin: 0;
-	font-family: 'Doto', sans-serif;
-	font-optical-sizing: auto;
+	font-family: 'Silkscreen', sans-serif;
 	font-weight: 400;
 	font-style: normal;
-	font-variation-settings: 'ROND' 0;
-	font-size: 12px;
+	font-size: 14px;
 	color: var(--main-color);
 }
 button {
 	background: none;
 	color: var(--main-color);
-	border: 1px dashed var(--main-color);
-	font-family: 'Doto', sans-serif;
+	border: 1px solid var(--main-color);
+	font-family: inherit;
 	padding: 0.25em 1.25em;
 	transition: background-color 2.5s ease;
 	background-color: var(--background);
 }
 button:hover {
 	cursor: pointer;
-	background-color: var(--background-lighter);
+	background-color: var(--background-selected);
 }
 .active {
-	font-weight: 900;
-	background-color: var(--background-lighter);
+	font-weight: bold;
+	background-color: var(--background-selected);
 }
 .explanation {
 	width: 500px;
@@ -50,7 +48,7 @@ button:hover {
 }
 .tick line {
 	stroke: var(--main-color);
-	stroke-dasharray: 2;
+	/* stroke-dasharray: 2; */
 	opacity: 0.5;
 }
 .tick text {
@@ -58,9 +56,16 @@ button:hover {
 }
 
 .tippy-box[data-theme~='tomato'] {
-	background-color: var(--background);
+	background-color: var(--background-selected);
 	color: var(--main-color);
-	border: 1px dashed var(--main-color);
+	border: 1px solid var(--main-color);
 	padding: 0.25em 1.25em;
 	font-size: inherit;
+}
+
+.tippy-box[data-animation='myFade'][data-state='hidden'] {
+	opacity: 0;
+}
+.tippy-box[data-animation='myFade'][data-state='visivle'] {
+	opacity: 100;
 }
