@@ -6,6 +6,5 @@
 </script>
 
 <div class="overTime">
-	<h3>Under Construction</h3>
 	<Line {overtimeSentiment} />
 </div>

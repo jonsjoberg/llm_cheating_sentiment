@@ -31,12 +31,22 @@ button {
 	border: 1px solid var(--main-color);
 	font-family: inherit;
 	padding: 0.25em 1.25em;
-	transition: background-color 2.5s ease;
+	transition:
+		background-color 2.5s ease,
+		opacity 1s ease;
 	background-color: var(--background);
+	font-size: 14px;
 }
 button:hover {
 	cursor: pointer;
 	background-color: var(--background-selected);
+}
+button:disabled {
+	opacity: 0.5;
+}
+button:disabled:hover {
+	cursor: default;
+	background-color: var(--background);
 }
 .active {
 	font-weight: bold;
@@ -68,4 +78,15 @@ button:hover {
 }
 .tippy-box[data-animation='myFade'][data-state='visivle'] {
 	opacity: 100;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+	-moz-appearance: textfield;
 }
