@@ -1,7 +1,12 @@
-from enum import Enum
+from enum import StrEnum
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
+
+
+class LLMServiceType(StrEnum):
+    LOCAL = "local"
+    OPENROUTER = "openrouter"
 
 
 class SteamProduct(BaseModel):
@@ -25,7 +30,7 @@ class Author(BaseModel):
 class SteamReview(BaseModel):
     recommendation_id: int = Field(alias="recommendationid")
     author: Author
-    language: str
+    language: str = ""
     review: str
     timestamp_created: datetime
     timestamp_updated: datetime
@@ -56,7 +61,7 @@ class SteamReviews(BaseModel):
     cursor: str
 
 
-class CheatingSentiment(Enum):
+class CheatingSentiment(StrEnum):
     POSITIVE = "positive"
     NOT_MENTIONED = "not mentioned"
     NEGATIVE = "negative"

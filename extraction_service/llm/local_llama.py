@@ -9,6 +9,9 @@ from defined_types import (
 )
 from .client import LLMClient
 
+LLM_MAX_CONCURRENT = 10
+LLM_MAX_REQUESTS_PER_SECOND = 10
+
 
 class LocalLlama(LLMClient):
     # TODO: This shouldn't be hardcoded
@@ -18,7 +21,6 @@ class LocalLlama(LLMClient):
     def __init__(self, base_prompt: str | None = None):
         if base_prompt is not None:
             self.base_prompt = base_prompt
-        pass
 
     def get_model(self) -> str:
         return self.model

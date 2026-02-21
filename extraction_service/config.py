@@ -11,8 +11,7 @@ apex = SteamProduct(name="Apex Legends", app_id=1172470)
 cod = SteamProduct(name="Call of Duty®: Black Ops 7", app_id=3606480)
 
 STEAM_REQUEST_PER_SECOND = 2
-LLM_MAX_CONCURRENT = 10
-LLM_MAX_REQUESTS_PER_SECOND = 10
+
 
 
 FIREBASE_JSON = "cheating-sentiment-firebase-adminsdk.json"
