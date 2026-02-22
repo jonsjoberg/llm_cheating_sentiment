@@ -8,10 +8,8 @@ pubg = SteamProduct(name="PUBG: BATTLEGROUNDS", app_id=578080)
 marvel = SteamProduct(name="Marvel Rivals", app_id=2767030)
 tarkov = SteamProduct(name="Escape from Tarkov", app_id=3932890)
 apex = SteamProduct(name="Apex Legends", app_id=1172470)
-cod = SteamProduct(name="Call of Duty®: Black Ops 7", app_id=3606480)
 
 STEAM_REQUEST_PER_SECOND = 2
-
 
 
 FIREBASE_JSON = "cheating-sentiment-firebase-adminsdk.json"

@@ -11,7 +11,6 @@ from config import (
     apex,
     arc,
     bf6,
-    cod,
     cs2,
     finals,
     marvel,
@@ -122,7 +121,7 @@ async def main():
         log.info(f"returned sentiment: {reviews_with_sentiment[0].cheating_sentiment}")
         return
 
-    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex, cod]
+    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex]
     if args.summarize_only:
         for app in steam_apps:
             today = datetime.now().date()
