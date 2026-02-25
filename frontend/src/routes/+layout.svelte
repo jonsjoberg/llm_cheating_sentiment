@@ -18,5 +18,6 @@
 		rel="stylesheet"
 	/>
 	<link rel="icon" href={favicon} />
+	<title>What's the sentiment around cheating in your game?</title>
 </svelte:head>
 {@render children()}

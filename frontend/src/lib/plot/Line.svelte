@@ -218,7 +218,7 @@
 
 	let hoveredLine: string | null = $state(null);
 	let selectedLines: string[] = $state([]);
-	let rollingDayWindowActive = $state('none');
+	let rollingDayWindowActive = $state('week');
 	let customRollingAvg = $state(null);
 	$inspect(rollingDayWindow);
 </script>
@@ -362,5 +362,6 @@
 		font-style: normal;
 		font-size: 14px;
 		padding: 0;
+		border: 1px solid var(--main-color);
 	}
 </style>
