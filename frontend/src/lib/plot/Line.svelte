@@ -137,6 +137,19 @@
 		);
 	};
 
+	const calculateRollingDayWindow = (rollingDayWindowActive: string): number => {
+		switch (rollingDayWindowActive) {
+			case 'none':
+				return 1;
+			case 'week':
+				return 7;
+			case 'custom':
+				return customRollingAvg ?? 1;
+			default:
+				return 1;
+		}
+	};
+
 	const rollingAvg = (windowDays: number, overtimeSentiment: SentimentPerDaysAndApp[]) => {
 		const plotData = overtimeSentiment.map((oS) => {
 			const res = [];
@@ -164,9 +177,10 @@
 		}[];
 	};
 
-	let rollingDayWindow = $state(1);
+	let rollingDayWindowActive = $state('week');
+	let rollingDayWindow: number = $derived(calculateRollingDayWindow(rollingDayWindowActive));
+	$inspect(rollingDayWindow);
 	let plotData: PlotData[] = $derived(rollingAvg(rollingDayWindow, overtimeSentiment));
-	$inspect(plotData);
 
 	const minMaxYValues = $derived(calculateMinMaxYValues(plotData));
 
@@ -198,29 +212,15 @@
 	);
 
 	const handleRollingAvgChange = (newSetting: string) => {
-		console.log(newSetting);
 		rollingDayWindowActive = newSetting;
-
-		switch (newSetting) {
-			case 'none':
-				customRollingAvg = null;
-				rollingDayWindow = 1;
-				break;
-			case 'week':
-				customRollingAvg = null;
-				rollingDayWindow = 7;
-				break;
-			case 'custom':
-				rollingDayWindow = customRollingAvg ?? 1;
-				break;
+		if (newSetting !== 'custom') {
+			customRollingAvg = null;
 		}
 	};
 
 	let hoveredLine: string | null = $state(null);
 	let selectedLines: string[] = $state([]);
-	let rollingDayWindowActive = $state('week');
-	let customRollingAvg = $state(null);
-	$inspect(rollingDayWindow);
+	let customRollingAvg: number | null = $state(null);
 </script>
 
 <div class="chart">
