@@ -6,14 +6,6 @@
 	import Label from './Label.svelte';
 	const { overtimeSentiment }: { overtimeSentiment: SentimentPerDaysAndApp[] } = $props();
 
-	function* dateGenerator(start: Date, end: Date, spacing: number) {
-		let current = new Date(start);
-		while (current <= end) {
-			yield new Date(current);
-			current.setDate(current.getDate() + spacing);
-		}
-	}
-
 	function* yTickGenerator(min: number, max: number, spacing: number) {
 		let current = Math.floor(min);
 		while (current <= Math.ceil(max)) {
@@ -22,7 +14,7 @@
 		}
 	}
 
-	const findFirstDate = (plotData: PlotData[]): Date[] => {
+	const findFirstAndLastDate = (plotData: PlotData[]): Date[] => {
 		let fDt = new Date();
 		let lDt = new Date(0);
 
@@ -36,7 +28,6 @@
 				}
 			});
 		});
-
 		return [fDt, lDt];
 	};
 
@@ -188,14 +179,15 @@
 	const height = $state(500);
 	const padding = 20;
 
-	const firstAndLastDate = $derived(findFirstDate(plotData));
+	const firstAndLastDate = $derived(findFirstAndLastDate(plotData));
 	const xScale = $derived(
 		scaleTime()
 			.domain(firstAndLastDate)
 			.range([padding, width - padding])
 	);
-	const xTicks = $derived([...dateGenerator(firstAndLastDate[0], firstAndLastDate[1], 7)]);
 
+	const xTickCount = $derived(Math.max(2, Math.floor(width / 100)));
+	const xTicks = $derived(xScale.ticks(xTickCount));
 	const yScale = $derived(
 		scaleLinear()
 			.domain([minMaxYValues.max, minMaxYValues.min])

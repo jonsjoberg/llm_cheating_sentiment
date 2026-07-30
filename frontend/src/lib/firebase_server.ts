@@ -115,7 +115,6 @@ export const getSentimentPerDaysAndApp = async (
 		reviewsPerDayQuery = reviewsPerDayQuery.endAt(toDate.toISOString().split('T')[0]);
 
 	const reviewsPerDay = await reviewsPerDayQuery.get();
-
 	const sentimentsPerDay: SentimentPerDay[] = reviewsPerDay.docs.map((d) => {
 		return {
 			day: new Date(`${d.ref.id}T00:00:00`),
