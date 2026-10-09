@@ -8,9 +8,10 @@ pubg = SteamProduct(name="PUBG: BATTLEGROUNDS", app_id=578080)
 marvel = SteamProduct(name="Marvel Rivals", app_id=2767030)
 tarkov = SteamProduct(name="Escape from Tarkov", app_id=3932890)
 apex = SteamProduct(name="Apex Legends", app_id=1172470)
+marathon = SteamProduct(name="Marathon", app_id=3065800)
 
 STEAM_REQUEST_PER_SECOND = 2
 
 
 FIREBASE_JSON = "cheating-sentiment-firebase-adminsdk.json"
-DEFAULT_LOOKBACK_WINDOW_HOURS = 24 * 7
+DEFAULT_LOOKBACK_WINDOW_HOURS = 24 * 90

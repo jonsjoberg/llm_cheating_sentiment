@@ -9,6 +9,7 @@ dependencies = [
     "firebase-admin>=7.1.0",
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
+    "rich>=15.0.0",
 ]
 
 [dependency-groups]

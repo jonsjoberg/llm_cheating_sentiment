@@ -1,13 +1,18 @@
-import sys
-import logging
-log_level = logging.INFO  # Change INFO to DEBUG for verbose logging
-log_format = '%(asctime)s  %(levelname)-8s %(message)s'
-log_date_format = '%Y-%m-%d %H:%M:%S'
+from rich.console import Console
 
-log = logging.getLogger(__name__)
-logging.basicConfig(
-    stream=sys.stdout,
-    level=log_level,
-    format=log_format,
-    datefmt=log_date_format
-)
+console = Console()
+
+class Logger:
+    def info(self, msg, *args, **kwargs):
+        console.print(f"[bold blue]INFO:[/bold blue] {msg}")
+
+    def warning(self, msg, *args, **kwargs):
+        console.print(f"[bold yellow]WARN:[/bold yellow] {msg}")
+
+    def error(self, msg, *args, **kwargs):
+        console.print(f"[bold red]ERROR:[/bold red] {msg}")
+    
+    def debug(self, msg, *args, **kwargs):
+        console.print(f"[dim]DEBUG:[/dim] {msg}")
+
+log = Logger()

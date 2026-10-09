@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { SentimentPerDay, SentimentPerDaysAndApp } from '$lib/firebase_server';
-	import { scaleLinear, scaleTime, type NumberValue } from 'd3-scale';
+	import { scaleLinear, scaleTime } from 'd3-scale';
 	import { line } from 'd3-shape';
-	import tippy, { followCursor, type MultipleTargets } from 'tippy.js';
+	import tippy, { followCursor } from 'tippy.js';
 	import Label from './Label.svelte';
 	const { overtimeSentiment }: { overtimeSentiment: SentimentPerDaysAndApp[] } = $props();
 
@@ -63,7 +63,7 @@
 	};
 
 	const tooltip = (pd: PlotData) => {
-		return (node: MultipleTargets) => {
+		return (node: Element) => {
 			const tooltip = tippy(node, {
 				content: pd.name,
 				followCursor: true,
@@ -143,11 +143,13 @@
 
 	const rollingAvg = (windowDays: number, overtimeSentiment: SentimentPerDaysAndApp[]) => {
 		const plotData = overtimeSentiment.map((oS) => {
-			const res = [];
+			const res: PlotPoint[] = [];
 			for (let i = windowDays; i < oS.sentimentsPerDay.length; i++) {
-				const currentResult = calculateResultingPct(oS.sentimentsPerDay.slice(i - windowDays, i));
-				if (currentResult.resultingPct != null) {
-					res.push(currentResult);
+				const { date, resultingPct } = calculateResultingPct(
+					oS.sentimentsPerDay.slice(i - windowDays, i)
+				);
+				if (resultingPct != null) {
+					res.push({ date, resultingPct });
 				}
 			}
 
@@ -160,17 +162,18 @@
 		return plotData.filter((pd) => pd.sentimentPerDay.length > 0);
 	};
 
+	type PlotPoint = {
+		date: Date;
+		resultingPct: number;
+	};
+
 	type PlotData = {
 		name: string;
-		sentimentPerDay: {
-			date: Date;
-			resultingPct: number;
-		}[];
+		sentimentPerDay: PlotPoint[];
 	};
 
 	let rollingDayWindowActive = $state('week');
 	let rollingDayWindow: number = $derived(calculateRollingDayWindow(rollingDayWindowActive));
-	$inspect(rollingDayWindow);
 	let plotData: PlotData[] = $derived(rollingAvg(rollingDayWindow, overtimeSentiment));
 
 	const minMaxYValues = $derived(calculateMinMaxYValues(plotData));
@@ -198,9 +201,9 @@
 	const yTicks = $derived([...yTickGenerator(minMaxYValues.min, minMaxYValues.max, ySpacing)]);
 
 	const lineGenerator = $derived(
-		line()
-			.x((d: { date: string | number | Date }) => xScale(new Date(d.date)))
-			.y((d: { resultingPct: NumberValue }) => yScale(d.resultingPct))
+		line<PlotPoint>()
+			.x((d) => xScale(d.date))
+			.y((d) => yScale(d.resultingPct))
 	);
 
 	const handleRollingAvgChange = (newSetting: string) => {
@@ -217,7 +220,7 @@
 
 <div class="chart">
 	<div class="selectionBar">
-		{#each overtimeSentiment as d}
+		{#each overtimeSentiment as d (d.app.appId)}
 			<button
 				disabled={shouldBeDisabled(d.app.name)}
 				onclick={() => toggleSelectedLine(d.app.name)}
@@ -232,20 +235,20 @@
 		{/each}
 	</div>
 	<svg {width} {height}>
-		{#each xTicks as tick}
+		{#each xTicks as tick (tick.getTime())}
 			<g transform="translate({xScale(tick)}, 0)" class="tick">
 				<line y1="0" y2={height - 2 * padding} />
 				<text y={height - padding} text-anchor="middle">{tick.toISOString().split('T')[0]}</text>
 			</g>
 		{/each}
 
-		{#each yTicks as tick}
+		{#each yTicks as tick (tick)}
 			<g transform="translate(0, {yScale(tick)})" class="tick">
 				<line x1="0" x2={width} />
 				<text x={width - padding} text-anchor="middle">{tick}</text>
 			</g>
 		{/each}
-		{#each plotData as pd}
+		{#each plotData as pd (pd.name)}
 			<g class="line-group">
 				<path
 					{@attach tooltip(pd)}

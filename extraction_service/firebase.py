@@ -32,7 +32,6 @@ async def get_last_review_ts(db: AsyncClient, app_id: int) -> datetime | None:
         .select(["timestamp_created"])
         .get()
     )
-    log.info(last_review)
     last_timestamp_created = (
         last_review[0].get("timestamp_created").replace(tzinfo=timezone.utc)
     )

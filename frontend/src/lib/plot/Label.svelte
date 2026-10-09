@@ -3,13 +3,14 @@
 
 	let { text } = $props();
 
-	let textElement = $state();
+	let textElement: SVGTextElement | undefined = $state();
 
 	let box = $state({ x: 0, y: 0, width: 0, height: 0 });
 
 	const padding = 5;
 
 	$effect(() => {
+		if (!textElement) return;
 		const textBBox = textElement.getBBox();
 		box = {
 			x: textBBox.x - padding,

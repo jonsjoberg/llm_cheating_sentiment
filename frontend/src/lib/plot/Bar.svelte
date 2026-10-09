@@ -4,21 +4,21 @@
 
 	const { reviewData }: { reviewData: AppReviewsPerSentiment[] } = $props();
 	const plotData = $derived(
-		reviewData.map((r) => {
-			return {
-				name: r.app.name,
-				positivePct:
-					(100 * r.reviewsPerSentiment.positive) /
-					(r.reviewsPerSentiment.positive +
-						r.reviewsPerSentiment.notMentioned +
-						r.reviewsPerSentiment.negative),
-				negativePct:
-					(-100 * r.reviewsPerSentiment.negative) /
-					(r.reviewsPerSentiment.positive +
-						r.reviewsPerSentiment.notMentioned +
-						r.reviewsPerSentiment.negative)
-			};
-		})
+		reviewData
+			.map((r) => {
+				const total =
+					r.reviewsPerSentiment.positive +
+					r.reviewsPerSentiment.notMentioned +
+					r.reviewsPerSentiment.negative;
+				return {
+					name: r.app.name,
+					total,
+					positivePct: (100 * r.reviewsPerSentiment.positive) / total,
+					negativePct: (-100 * r.reviewsPerSentiment.negative) / total
+				};
+			})
+			// apps without any reviews in the window would yield NaN percentages
+			.filter((d) => d.total > 0)
 	);
 
 	const calculateXTicks = (maxPct: number, spacing: number): number[] => {
@@ -32,7 +32,7 @@
 
 	const maxPositivePct = $derived(Math.max(...plotData.map((i) => i.positivePct!)));
 	const minNegativePct = $derived(Math.min(...plotData.map((i) => i.negativePct!)));
-	const maxPct = $derived(Math.max(maxPositivePct, -minNegativePct));
+	const maxPct = $derived(plotData.length > 0 ? Math.max(maxPositivePct, -minNegativePct, 1) : 1);
 	const spacing = $derived(maxPct > 10 ? 2.5 : 1);
 	// const spacing = 25;
 	const xTicks = $derived(calculateXTicks(maxPct, spacing));
@@ -61,7 +61,7 @@
 <div class="chart" bind:clientWidth={width}>
 	<svg {width} {height}>
 		<g>
-			{#each xTicks as tick}
+			{#each xTicks as tick (tick)}
 				<g transform="translate({xScale(tick)}, 0)" class="tick">
 					<line y1="0" y2={height - 2 * padding} />
 					<text y={height - padding} text-anchor="middle">{tick}</text>
@@ -70,12 +70,12 @@
 		</g>
 
 		<g class="positiveBar">
-			{#each plotData as d, i}
+			{#each plotData as d, i (d.name)}
 				<rect x={zeroX} y={yScale(i)} width={xScale(d.positivePct) - zeroX} height={barheight} />
 			{/each}
 		</g>
 		<g class="negativeBar">
-			{#each plotData as d, i}
+			{#each plotData as d, i (d.name)}
 				<rect
 					x={xScale(d.negativePct)}
 					y={yScale(i)}
@@ -85,7 +85,7 @@
 			{/each}
 		</g>
 		<g class="name">
-			{#each plotData as d, i}
+			{#each plotData as d, i (d.name)}
 				<text
 					y={yScale(i) + barheight / 2}
 					x={zeroX}

@@ -13,7 +13,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each snapshotReviewData as a}
+		{#each snapshotReviewData as a (a.app.appId)}
 			<tr>
 				<td>{a.app.name}</td>
 				<td>{a.reviewsPerSentiment.positive}</td>

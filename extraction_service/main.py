@@ -16,11 +16,15 @@ from config import (
     marvel,
     pubg,
     tarkov,
+    marathon,
 )
 from defined_types import LLMServiceType, ReviewWithSentiment, SteamProduct
 from llm import local_llama, openrouter
 from llm.client import LLMClient, extract_cheating_sentiment
-from log import log
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+
+console = Console()
 from mocks import generate_mock_review, generate_mock_steam_product
 from steam_product import fetch_steam_reviews, steam_review_base_url
 
@@ -30,7 +34,11 @@ load_dotenv()
 def get_dates(reviews_with_sentiments: list[ReviewWithSentiment]) -> set[date]:
 
     dates = set(
-        [r.steam_review.timestamp_created.date() for r in reviews_with_sentiments]
+        [
+            r.steam_review.timestamp_created.date()
+            for r in reviews_with_sentiments
+            if r.cheating_sentiment is not None
+        ]
     )
     return dates
 
@@ -105,7 +113,7 @@ async def main():
             llm_max_concurrent = openrouter.LLM_MAX_CONCURRENT
             llm_max_requests_per_second = openrouter.LLM_MAX_REQUESTS_PER_SECOND
         case _:
-            log.error(f"unknown LLM Client Type: {args.model_service}")
+            console.print(f"[bold red]error[/bold red] unknown LLM Client Type: {args.llm_service_type}")
             return
 
     if args.test_review is not None:
@@ -118,25 +126,43 @@ async def main():
             max_request_per_seconds=llm_max_requests_per_second,
         )
 
-        log.info(f"returned sentiment: {reviews_with_sentiment[0].cheating_sentiment}")
+        console.print(f"[bold green]returned sentiment:[/bold green] {reviews_with_sentiment[0].cheating_sentiment}")
         return
 
-    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex]
+    steam_apps = [finals, arc, bf6, cs2, pubg, marvel, tarkov, apex, marathon]
     if args.summarize_only:
-        for app in steam_apps:
-            today = datetime.now().date()
-            last_10_days = [today - timedelta(days=i) for i in range(10)]
-            await firebase.summarize_reviews(firestore_client, app, set(last_10_days))
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
+            task = progress.add_task("Summarizing reviews...", total=len(steam_apps))
+            for app in steam_apps:
+                progress.update(task, description=f"Summarizing {app.name}...")
+                today = datetime.now().date()
+                last_10_days = [today - timedelta(days=i) for i in range(10)]
+                await firebase.summarize_reviews(firestore_client, app, set(last_10_days))
+                progress.advance(task)
+        console.print("[bold green]Summarization complete![/bold green]")
         return
 
-    for app in steam_apps:
-        await extract_for_steam_product(
-            db=firestore_client,
-            steam_product=app,
-            llm_client=llm_client,
-            llm_max_concurrent=llm_max_concurrent,
-            llm_max_requests_per_second=llm_max_requests_per_second,
-        )
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        task = progress.add_task("Extracting sentiment...", total=len(steam_apps))
+        for app in steam_apps:
+            progress.update(task, description=f"Extracting for {app.name}...")
+            await extract_for_steam_product(
+                db=firestore_client,
+                steam_product=app,
+                llm_client=llm_client,
+                llm_max_concurrent=llm_max_concurrent,
+                llm_max_requests_per_second=llm_max_requests_per_second,
+            )
+            progress.advance(task)
+    console.print("[bold green]Extraction complete![/bold green]")
 
 
 if __name__ == "__main__":

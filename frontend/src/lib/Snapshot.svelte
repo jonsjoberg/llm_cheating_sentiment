@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import type { AppReviewsPerSentiment } from './firebase_server';
 	import Bar from './plot/Bar.svelte';
 	import Table from './Table.svelte';

@@ -42,3 +42,4 @@ frontend/.firebase/
 frontend/.firebaserc
 
 llama_server.log
+llama_server_*.log

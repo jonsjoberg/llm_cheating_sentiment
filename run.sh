@@ -17,8 +17,18 @@ if [[ "$1" == "local" ]]; then
     }
     trap cleanup EXIT
 
+    # Log rotation: keep the last 3 runs
+    for i in 2 1; do
+        if [ -f "llama_server_$i.log" ]; then
+            mv "llama_server_$i.log" "llama_server_$((i+1)).log"
+        fi
+    done
+    if [ -f "llama_server.log" ]; then
+        mv "llama_server.log" "llama_server_1.log"
+    fi
+
     # Start a local OpenAI-compatible server with a web UI:
-    llama-server -hf "$MODEL" --port $PORT -ngl 99 > llama_server.log 2>&1 & SERVER_PID=$!
+    llama-server -hf "$MODEL" --port $PORT -ngl 99 --log-disable > llama_server.log 2>&1 & SERVER_PID=$!
 
     echo "Starting llama-server (PID: $SERVER_PID)"
 
